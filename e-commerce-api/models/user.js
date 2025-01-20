@@ -29,8 +29,5 @@ User.beforeCreate(async (user) => {
 User.prototype.comparePassword = async function (password) {
   return bcrypt.compare(password, this.password_hash);
 };
-User.prototype.comparePassword2 = async function (password) {
-  return bcrypt.compare(password, this.password_hash);
-};
 
 module.exports = User;
