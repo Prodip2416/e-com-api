@@ -3,7 +3,7 @@ const responseMiddleware = (req, res, next) => {
   const originalJson = res.json;
 
   res.json = function (data) {
-    console.log({data})
+    // console.log({data})
     // Check if data has a 'status' field, to distinguish between errors and normal responses
     if (data?.status === "error") {
       return originalJson.call(this, {

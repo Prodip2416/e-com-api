@@ -1,46 +1,46 @@
-const sequelize = require("../config/config");
-const User = require("./user");
-const Role = require("./roles");
-const { DataTypes } = require("sequelize");
-
-// models/userRole.js
-const UserRole = sequelize.define("UserRole", {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  user_id: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: "Users", 
-      key: "id",
+module.exports = (sequelize, DataTypes) => {
+  const UserRole = sequelize.define("UserRole", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-  },
-  role_id: {
-    type: DataTypes.INTEGER,
-    references: {
-      model: "Roles", 
-      key: "id",
+    user_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "Users", // Table name
+        key: "id",
+      },
     },
-  },
-});
+    role_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "Roles", // Table name
+        key: "id",
+      },
+    },
+  });
 
-// Set up associations
-User.belongsToMany(Role, {
-  through: UserRole,
-  foreignKey: "user_id",
-});
+  // Associate method for defining relationships
+  UserRole.associate = (models) => {
+    // Many-to-Many between User and Role through UserRole
+    models.User.belongsToMany(models.Role, {
+      through: UserRole,
+      foreignKey: "user_id",
+      as: "roles",
+    });
 
-Role.belongsToMany(User, {
-  through: UserRole,
-  foreignKey: "role_id",
-});
+    models.Role.belongsToMany(models.User, {
+      through: UserRole,
+      foreignKey: "role_id",
+      as: "users",
+    });
 
-// Optional: Define direct associations if you want to query through UserRole
-UserRole.belongsTo(User, { foreignKey: "user_id" });
-UserRole.belongsTo(Role, { foreignKey: "role_id" });
+    // Optional: Add direct UserRole -> User and UserRole -> Role associations
+    UserRole.belongsTo(models.User, { foreignKey: "user_id", as: "user" });
+    UserRole.belongsTo(models.Role, { foreignKey: "role_id", as: "role" });
+  };
 
-
-
-module.exports = UserRole;
+  return UserRole;
+};

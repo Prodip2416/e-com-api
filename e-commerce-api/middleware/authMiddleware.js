@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const JWTToken = require("../models/jwtToken");
+const { JWTToken } = require("../models");
 const { Op } = require("sequelize");
 require("dotenv").config();
 
@@ -29,14 +29,18 @@ const authenticate = async (req, res, next) => {
       },
     });
     if (!tokenRecord) {
-      return res.status(401).json({ message: "No Token found from DB!." });
+      return res
+        .status(401)
+        .json({ status: "error", message: "No Token found from DB!." });
     }
 
     req.user = decoded;
     next();
   } catch (error) {
-    console.log(error?.name);
-    return res.status(400).json({ message: "Invalid token.", error });
+    // console.log(error?.name);
+    return res
+      .status(400)
+      .json({ status: "error", message: "Invalid token.", error });
   }
 };
 

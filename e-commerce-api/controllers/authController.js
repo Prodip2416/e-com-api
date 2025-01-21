@@ -1,14 +1,14 @@
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const User = require("../models/user");
-const JWTToken = require("../models/jwtToken");
+const {User, JWTToken} = require("../models");
 const { JWT_SECRET } = process.env;
 
 const signUp = async (req, res) => {
   try {
     const { name, email, password } = req.body;
-
+    console.log('first')
     const existingUser = await User.findOne({ where: { email } });
+    console.log('firstss')
+    console.log(existingUser)
     if (existingUser) {
       return res
         .status(400)
@@ -20,6 +20,7 @@ const signUp = async (req, res) => {
         name,
         email,
         password_hash: password,
+        is_email_verified: false
       });
       const userResponse = newUser.get({ plain: true });
       delete userResponse.password_hash;
@@ -33,6 +34,7 @@ const signUp = async (req, res) => {
         .json({ status: "error", message: "Does not match requirnment!" });
     }
   } catch (error) {
+    console.log(error)
     res
       .status(500)
       .json({ status: "error", message: "Error during signup", error });

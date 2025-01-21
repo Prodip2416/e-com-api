@@ -1,4 +1,4 @@
-const Role = require("../models/roles");
+const { Role } = require("../models");
 const { handleValidationErrors } = require("../utils/lib");
 
 // Create a new role

@@ -1,8 +1,10 @@
-const User = require("../models/user");
-const Role = require("../models/roles");
-const UserRole = require("../models/userRoles");
+const { User, Role, UserRole } = require("../models");
+const { handleValidationErrors } = require("../utils/lib");
 
 const assignRoleToUser = async (req, res) => {
+  const validationError = handleValidationErrors(req, res);
+  if (validationError) return validationError;
+
   const { userId, roleId } = req.body;
 
   try {
@@ -43,6 +45,9 @@ const assignRoleToUser = async (req, res) => {
 
 // Remove a role from a user
 const removeRoleFromUser = async (req, res) => {
+  const validationError = handleValidationErrors(req, res);
+  if (validationError) return validationError;
+
   const { userId, roleId } = req.body;
 
   try {
@@ -88,10 +93,7 @@ const getUserRoles = async (req, res) => {
   try {
     const fineItem = await UserRole.findAll({
       where: { user_id: userId },
-      include: [
-        { model: User, attributes: ["id", "name"] },
-        { model: Role, attributes: ["id", "name"] },
-      ],
+      include: [{ model: Role, as: "role", attributes: ["id", "name"] }],
     });
 
     if (fineItem.length === 0) {
@@ -101,12 +103,26 @@ const getUserRoles = async (req, res) => {
       });
     }
 
+    const transformedData = fineItem.reduce((acc, item) => {
+      let existingUser = acc.find((u) => u.user_id === item.user_id);
+      if (!existingUser) {
+        existingUser = {
+          id: item.id,
+          user_id: item.user_id,
+          roles: [],
+        };
+        acc.push(existingUser);
+      }
+      existingUser.roles.push(item.role);
+      return acc;
+    }, []);
+
     return res.status(200).json({
       status: "success",
-      data: fineItem,
+      data: transformedData,
     });
   } catch (error) {
-    console.error("Error fetching user roles:", error);
+    // console.error("Error fetching user roles:", error);
     return res.status(500).json({
       status: "error",
       message: "Failed to fetch user roles",

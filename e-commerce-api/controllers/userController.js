@@ -1,4 +1,4 @@
-const User = require("../models/user");
+const { User } = require("../models");
 
 // Get list of all users
 const getUsers = async (req, res) => {
@@ -12,6 +12,7 @@ const getUsers = async (req, res) => {
       data: users,
     });
   } catch (error) {
+    // console.log(error);
     res.status(500).json({ message: "Error fetching users.", error });
   }
 };
