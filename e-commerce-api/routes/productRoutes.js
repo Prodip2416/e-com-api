@@ -33,6 +33,6 @@ router.put(
   updateProductValidation,
   updateProduct
 );
-router.delete("/product", authenticate, getByIdValidation, deleteProduct);
+router.delete("/product/:id", authenticate, getByIdValidation, deleteProduct);
 
 module.exports = router;

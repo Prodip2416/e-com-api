@@ -1,7 +1,8 @@
 const { Product, ProductImage } = require("../models");
 const { handleValidationErrors } = require("../utils/lib");
-const path = require('path');
-const fs = require('fs');
+const path = require("path");
+const fs = require("fs");
+const { Op, where } = require("sequelize");
 
 const createProduct = async (req, res) => {
   try {
@@ -33,6 +34,7 @@ const createProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
   try {
     const products = await Product.findAll({
+      where: { is_active: true },
       attributes: ["id", "name", "description", "price", "stock"],
       include: [
         { model: ProductImage, as: "images", attributes: ["imageUrl"] },
@@ -88,6 +90,8 @@ const updateProduct = async (req, res) => {
 
     const { name, description, price, stock, id, deletedId = [] } = req.body;
     const newImages = req.files || [];
+    const deletedIdArray =
+      deletedId.length > 0 ? deletedId.split(",").map(Number) : [];
 
     // Find the product by ID
     const product = await Product.findByPk(id, {
@@ -99,25 +103,30 @@ const updateProduct = async (req, res) => {
         .status(404)
         .json({ status: "error", message: "Product not found" });
     }
-console.log(deletedId)
-    // Delete ProductImage records and corresponding files
-    if (deletedId.length > 0) {
+
+    if (deletedIdArray.length > 0) {
       const imagesToDelete = await ProductImage.findAll({
-        where: { id: deletedId },
+        where: {
+          id: {
+            [Op.in]: deletedIdArray,
+          },
+        },
       });
 
-      // Remove files from the upload folder
       imagesToDelete.forEach((image) => {
-        console.log('----------------------------------------------------')
-        console.log( image.imageUrl)
-        const filePath = path.join(__dirname, image.imageUrl);
+        const filePath = path.join(__dirname, "../", image.imageUrl);
         if (fs.existsSync(filePath)) {
           fs.unlinkSync(filePath);
         }
       });
 
-      // Delete ProductImage records from the database
-      // await ProductImage.destroy({ where: { id: deletedId } });
+      await ProductImage.destroy({
+        where: {
+          id: {
+            [Op.in]: deletedIdArray,
+          },
+        },
+      });
     }
 
     // Update product details
@@ -131,7 +140,7 @@ console.log(deletedId)
     if (newImages.length > 0) {
       const imageRecords = newImages.map((file) => ({
         productId: product.id,
-        imageUrl: file.filename, // Assuming Multer saves file with `filename`
+        imageUrl: file.path, // Assuming Multer saves file with `filename`
       }));
       await ProductImage.bulkCreate(imageRecords);
     }
@@ -158,19 +167,20 @@ console.log(deletedId)
 
 const deleteProduct = async (req, res) => {
   try {
-    const { id } = req?.body;
-    const role = await Product.findByPk(id);
-    if (!role) {
+    const { id } = req?.params;
+    const product = await Product.findByPk(id);
+    if (!product) {
       return res
         .status(404)
-        .json({ status: "error", message: "Role not found" });
+        .json({ status: "error", message: "Product not found" });
     }
-    await role.destroy();
-    return res.status(200).json({ message: "Role deleted successfully" });
+    product.is_active = false;
+    await product.save();
+    return res.status(200).json({ message: "Product deleted successfully" });
   } catch (error) {
     return res
       .status(500)
-      .json({ status: "error", message: "Failed to delete role" });
+      .json({ status: "error", message: "Failed to delete product" });
   }
 };
 
