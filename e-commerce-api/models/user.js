@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       is_active: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: true,
       },
     },
     {
@@ -36,14 +36,13 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
-  // Instance method for comparing passwords
   User.prototype.comparePassword = async function (password) {
     return bcrypt.compare(password, this.password_hash);
   };
 
-  // Associate method for defining relationships (if needed in the future)
   User.associate = (models) => {
-    // Example: User.hasMany(models.Order, { foreignKey: "userId", as: "orders" });
+    User.hasOne(models.Cart, { foreignKey: "user_id", as: "cart" });
+    User.hasOne(models.Order, { foreignKey: "user_id", as: "order" });
   };
 
   return User;

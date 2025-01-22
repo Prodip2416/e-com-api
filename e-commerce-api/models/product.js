@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
       is_active: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: true,
       },
     },
     {
@@ -36,6 +36,14 @@ module.exports = (sequelize, DataTypes) => {
     Product.hasMany(models.ProductImage, {
       foreignKey: "productId",
       as: "images",
+    });
+    Product.hasMany(models.CartItem, {
+      foreignKey: "product_id",
+      as: "cartItems",
+    });
+    Product.hasMany(models.OrderDetail, {
+      foreignKey: "product_id",
+      as: "orderdetails",
     });
   };
 
