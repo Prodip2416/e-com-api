@@ -23,6 +23,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: true,
       },
+      category_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "Categories", // Table name
+          key: "id",
+        },
+      },
     },
     {
       timestamps: true,
@@ -33,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
 
   // Define associations
   Product.associate = (models) => {
+    Product.belongsTo(models.Category, {
+      foreignKey: "category_id",
+      as: "category",
+    });
     Product.hasMany(models.ProductImage, {
       foreignKey: "productId",
       as: "images",
