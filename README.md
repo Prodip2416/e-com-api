@@ -100,22 +100,14 @@ This is a basic e-commerce application that provides essential features for user
 - **Sequelize**: ORM for database interactions.
 
 ### Database
-- **MySQL/PostgreSQL**: Relational database for structured data.
-- **Redis**: For caching frequently accessed data (optional).
+- **MySQL**: Relational database for structured data.
 
 ### Authentication
 - **JWT (JSON Web Tokens)**: For secure authentication and session management.
 
 ### Payment Gateway
-- **Stripe/PayPal/Razorpay**: For handling secure transactions.
+- **Stripe**: For handling secure transactions.
 
-### Frontend (optional for future integration)
-- **React.js**: For building dynamic user interfaces.
-- **Tailwind CSS**: For modern styling and responsiveness.
-
-### Deployment
-- **Docker**: For containerization.
-- **AWS/Heroku/Vercel**: For cloud hosting and scalability.
 
 ## Installation
 
@@ -127,11 +119,11 @@ This is a basic e-commerce application that provides essential features for user
 ### Steps
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-repo/ecommerce-app.git
+   git clone https://github.com/Prodip2416/e-com-service.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd ecommerce-app
+   cd e-com-service
    ```
 3. Install dependencies:
    ```bash
@@ -141,7 +133,7 @@ This is a basic e-commerce application that provides essential features for user
    - Create a `.env` file in the root directory.
    - Add the following variables:
      ```env
-     PORT=3000
+     PORT=5000
      DB_HOST=localhost
      DB_USER=root
      DB_PASSWORD=yourpassword
@@ -153,15 +145,14 @@ This is a basic e-commerce application that provides essential features for user
      ```
 5. Run database migrations (Sequelize example):
    ```bash
-   npx sequelize-cli db:migrate
+   npm run migrate
    ```
 6. Start the server:
    ```bash
    npm start
    ```
 7. Access the app:
-   - Frontend: `http://localhost:3000` (if frontend is included).
-   - Backend API: `http://localhost:3000/api`
+   - Backend API: `http://localhost:5000/api`
 
 ## API Endpoints (Sample)
 
