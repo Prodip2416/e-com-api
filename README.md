@@ -7,7 +7,7 @@ This is a basic e-commerce application that provides essential features for user
 
 ### 1. User Authentication & Authorization
 - **User Registration**: Users can sign up with email and password.
-- **User Login**: Login with secure password hashing (e.g., bcrypt).
+- **User Login**: Login with secure password hashing (bcrypt).
 - **JWT Authentication**: APIs are secured using JWT tokens for session management.
 - **Role-Based Access Control (RBAC)**:
   - Customers: Browse and purchase products.
@@ -30,7 +30,6 @@ This is a basic e-commerce application that provides essential features for user
   - Availability (in stock or out of stock)
 - **Sorting**: Sort products by:
   - Price (low to high, high to low)
-  - Popularity
   - Ratings
 
 ### 4. Shopping Cart
@@ -38,14 +37,12 @@ This is a basic e-commerce application that provides essential features for user
 - **Update Cart**: Modify product quantity or remove items.
 - **Persistent Cart**:
   - For logged-in users, the cart is stored in the database.
-  - Guest users have a session-based cart.
 - **Subtotal Calculation**: Automatically calculates the subtotal of items in the cart.
 
 ### 5. Wishlist
 - **Add to Wishlist**: Users can add products to their wishlist for future purchases.
 - **Persistent Wishlist**:
   - Saved for logged-in users in the database.
-  - Local storage for guest users.
 
 ### 6. Order Management
 - **Place Orders**: Users can place orders with a unique order ID.
@@ -58,25 +55,20 @@ This is a basic e-commerce application that provides essential features for user
 
 ### 7. Payment Gateway Integration
 - **Supported Payment Gateways**:
-  - Stripe, PayPal, Razorpay, etc.
+  - Stripe
 - **Multiple Payment Methods**:
   - Credit/Debit cards
-  - UPI
-  - Wallets
   - Cash on delivery
 - **Secure Transactions**: Payments are processed securely, and payment status is tracked.
 
 ### 8. Shipping & Address Management
 - **Shipping Address**: Users can save and manage multiple shipping addresses.
-- **Shipping Cost Calculation**: Dynamic cost calculation based on user location.
-- **Integration with Shipping Providers**: Support for real-time tracking with shipping APIs (e.g., FedEx, DHL).
 
 ### 9. Notifications
 - **Email Notifications**:
   - Order confirmation.
   - Shipping updates.
   - Password resets.
-- **Push Notifications**: Notify users of order updates and special offers.
 
 ### 10. Admin Panel
 - **Dashboard**: Admins can view:
@@ -114,7 +106,7 @@ This is a basic e-commerce application that provides essential features for user
 ### Prerequisites
 - Node.js (>= 14.x)
 - npm or yarn
-- A database (e.g., MySQL, PostgreSQL, or MongoDB)
+- A database ( MySQL )
 
 ### Steps
 1. Clone the repository:
@@ -157,11 +149,16 @@ This is a basic e-commerce application that provides essential features for user
 ## API Endpoints (Sample)
 
 ### Authentication
-| Method | Endpoint       | Description           |
-|--------|----------------|-----------------------|
-| POST   | /api/register  | Register a new user   |
-| POST   | /api/login     | Login a user          |
-| GET    | /api/profile   | Get user profile      |
+| Method | Endpoint          | Description                      |
+|--------|-------------------|----------------------------------|
+| POST   | /api/auth/signup  | Register a new user              |
+| POST   | /api/auth/verify  | Verify a user                    |
+| POST   | /api/auth/login   | Login user                       |
+
+### Users
+| Method | Endpoint          | Description                      |
+|--------|-------------------|----------------------------------|
+| GET    | /api/user/users   | Get all users                    |
 
 ### Products
 | Method | Endpoint              | Description                  |
