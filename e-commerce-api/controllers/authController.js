@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { User, JWTToken } = require("../models");
+const { User, JWTToken, UserRole, Role } = require("../models");
 const { sendEmail } = require("../utils/lib");
 const { JWT_SECRET } = process.env;
 require("dotenv").config();
@@ -58,6 +58,7 @@ const signUp = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    let roles = [];
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
@@ -65,7 +66,6 @@ const login = async (req, res) => {
         .status(400)
         .json({ status: "error", message: "Invalid email or password" });
     }
-
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res
@@ -73,10 +73,25 @@ const login = async (req, res) => {
         .json({ status: "error", message: "Invalid email or password" });
     }
 
-    // create token
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-      expiresIn: "1h",
+    // get roles for the user
+    const fineItem = await UserRole.findAll({
+      where: { user_id: user?.id },
+      include: [{ model: Role, as: "role", attributes: ["id", "name"] }],
     });
+
+    if (fineItem.length > 0) {
+      roles = fineItem.map((item) => item.role?.name);
+    }
+    // end role
+
+    // create token
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: roles },
+      JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
 
     await JWTToken.create({ user_id: user.id, jwt_token: token });
 

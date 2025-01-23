@@ -1,8 +1,8 @@
-const { Product, ProductImage } = require("../models");
+const { Product, ProductImage, Category } = require("../models");
 const { handleValidationErrors } = require("../utils/lib");
 const path = require("path");
 const fs = require("fs");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 
 const createProduct = async (req, res) => {
   try {
@@ -33,23 +33,103 @@ const createProduct = async (req, res) => {
 
 const getAllProduct = async (req, res) => {
   try {
+    // Extract filters from query parameters
+    const { minPrice, maxPrice, category, inStock, sortBy } = req.query;
+
+    // Build dynamic where clause for filtering
+    const whereClause = { is_active: true };
+
+    // Price range filter
+    if (minPrice && maxPrice) {
+      whereClause.price = {
+        [Op.between]: [parseFloat(minPrice), parseFloat(maxPrice)],
+      };
+    } else if (minPrice) {
+      whereClause.price = {
+        [Op.gte]: parseFloat(minPrice),
+      };
+    } else if (maxPrice) {
+      whereClause.price = {
+        [Op.lte]: parseFloat(maxPrice),
+      };
+    }
+
+    // Availability filter (in stock or out of stock)
+    if (inStock !== undefined) {
+      whereClause.stock = inStock === "true" ? { [Op.gt]: 0 } : 0;
+    }
+    let includeOptions = [
+      {
+        model: ProductImage,
+        as: "images",
+        attributes: ["imageUrl"],
+      },
+    ];
+    if (category) {
+      includeOptions.push({
+        model: Category, // Assuming there's a Category model
+        as: "category",
+        where: { name: category },
+        attributes: ["id", "name"],
+      });
+    }
+
+    // Sorting logic
+    let order = []; // Default no sorting
+    if (sortBy) {
+      switch (sortBy.toLowerCase()) {
+        case "price_asc":
+          order.push(["price", "ASC"]);
+          break;
+        case "price_desc":
+          order.push(["price", "DESC"]);
+          break;
+        case "rating":
+          order.push(["rating", "DESC"]); // Assuming a `rating` column exists in the Product model
+          break;
+        default:
+          break; // No sorting if sortBy is invalid
+      }
+    }
+
+    // Fetch products with applied filters & sorting
     const products = await Product.findAll({
-      where: { is_active: true },
+      where: whereClause,
       attributes: ["id", "name", "description", "price", "stock"],
-      include: [
-        { model: ProductImage, as: "images", attributes: ["imageUrl"] },
-      ],
+      include: includeOptions,
+      order,
     });
+
     return res
       .status(200)
-      .json({ message: "Data fetch Successfully.", data: products });
+      .json({ message: "Data fetched successfully.", data: products });
   } catch (error) {
-    // console.log(error);
+    console.error("Error fetching products:", error);
     return res
       .status(500)
       .json({ status: "error", message: "Failed to fetch products" });
   }
 };
+
+// const getAllProduct = async (req, res) => {
+//   try {
+//     const products = await Product.findAll({
+//       where: { is_active: true },
+//       attributes: ["id", "name", "description", "price", "stock"],
+//       include: [
+//         { model: ProductImage, as: "images", attributes: ["imageUrl"] },
+//       ],
+//     });
+//     return res
+//       .status(200)
+//       .json({ message: "Data fetch Successfully.", data: products });
+//   } catch (error) {
+//     // console.log(error);
+//     return res
+//       .status(500)
+//       .json({ status: "error", message: "Failed to fetch products" });
+//   }
+// };
 
 const getProductById = async (req, res) => {
   try {
