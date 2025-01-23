@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
@@ -21,6 +22,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
       },
+      email_verification_code: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
       is_active: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
@@ -31,6 +36,7 @@ module.exports = (sequelize, DataTypes) => {
       hooks: {
         beforeCreate: async (user) => {
           user.password_hash = await bcrypt.hash(user.password_hash, 10);
+          user.email_verification_code = crypto.randomBytes(16).toString("hex");
         },
       },
     }
