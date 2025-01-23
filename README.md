@@ -92,6 +92,31 @@ This is a basic e-commerce application that provides essential features for user
   - View order history.
   - Update order status.
 
+## Uses Technology
+
+### Backend
+- **Node.js**: Server-side runtime environment.
+- **Express.js**: Web application framework.
+- **Sequelize**: ORM for database interactions.
+
+### Database
+- **MySQL/PostgreSQL**: Relational database for structured data.
+- **Redis**: For caching frequently accessed data (optional).
+
+### Authentication
+- **JWT (JSON Web Tokens)**: For secure authentication and session management.
+
+### Payment Gateway
+- **Stripe/PayPal/Razorpay**: For handling secure transactions.
+
+### Frontend (optional for future integration)
+- **React.js**: For building dynamic user interfaces.
+- **Tailwind CSS**: For modern styling and responsiveness.
+
+### Deployment
+- **Docker**: For containerization.
+- **AWS/Heroku/Vercel**: For cloud hosting and scalability.
+
 ## Installation
 
 ### Prerequisites
