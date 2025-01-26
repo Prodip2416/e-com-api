@@ -16,7 +16,6 @@ const storage = multer.diskStorage({
     const routeSpecificPath = getFilePath(req.route.path);
     const finalPath = path.join(process.env.BASE_PATH, routeSpecificPath);
     fs.mkdirSync(finalPath, { recursive: true });
-
     cb(null, finalPath);
   },
   filename: (req, file, cb) => {

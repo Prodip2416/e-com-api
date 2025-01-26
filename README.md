@@ -23,14 +23,14 @@ This is a basic e-commerce application that provides essential features for user
   - Images
 
 ### 3. Product Search & Filtering
-- **Search Functionality**: Search products by name or keywords.
+- **Search Functionality**: Search products by name.
+- **Pagination**: limit, page
 - **Filters**: Filter products by:
   - Price range
   - Category
   - Availability (in stock or out of stock)
 - **Sorting**: Sort products by:
   - Price (low to high, high to low)
-  - Ratings
 
 ### 4. Shopping Cart
 - **Add to Cart**: Users can add products to their cart.

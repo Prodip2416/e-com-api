@@ -43,7 +43,30 @@ const sendEmail = async (to, subject, text, html) => {
   }
 };
 
+const paginateResults = (results, page = 1, limit = 10) => {
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+
+  const totalItems = results.length;
+  const totalPages = Math.ceil(totalItems / limit);
+
+  const paginatedResults = results.slice(startIndex, endIndex);
+
+  return {
+    results: paginatedResults,
+    pagination: {
+      currentPage: page,
+      totalPages,
+      totalItems,
+      limit,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1,
+    },
+  };
+};
+
 module.exports = {
   handleValidationErrors,
   sendEmail,
+  paginateResults,
 };

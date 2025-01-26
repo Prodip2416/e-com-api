@@ -1,5 +1,5 @@
 const { Product, ProductImage, Category } = require("../models");
-const { handleValidationErrors } = require("../utils/lib");
+const { handleValidationErrors, paginateResults } = require("../utils/lib");
 const path = require("path");
 const fs = require("fs");
 const { Op } = require("sequelize");
@@ -34,10 +34,14 @@ const createProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
   try {
     // Extract filters from query parameters
-    const { minPrice, maxPrice, category, inStock, sortBy } = req.query;
-
+    const { name, minPrice, maxPrice, category, inStock, sortBy } = req.query;
     // Build dynamic where clause for filtering
     const whereClause = { is_active: true };
+
+    //name filter
+    if (name) {
+      whereClause.name = { [Op.like]: `%${name}%` };
+    }
 
     // Price range filter
     if (minPrice && maxPrice) {
@@ -63,6 +67,11 @@ const getAllProduct = async (req, res) => {
         model: ProductImage,
         as: "images",
         attributes: ["imageUrl"],
+      },
+      {
+        model: Category,
+        as: "category",
+        attributes: ["id", "name"],
       },
     ];
     if (category) {
@@ -100,9 +109,19 @@ const getAllProduct = async (req, res) => {
       order,
     });
 
-    return res
-      .status(200)
-      .json({ message: "Data fetched successfully.", data: products });
+    const { results: paginatedProducts, pagination } = paginateResults(
+      products,
+      req.params.page,
+      req.params.limit
+    );
+
+    return res.status(200).json({
+      message: "Data fetched successfully.",
+      data: {
+        products: paginatedProducts,
+        pagination,
+      },
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
     return res
@@ -110,26 +129,6 @@ const getAllProduct = async (req, res) => {
       .json({ status: "error", message: "Failed to fetch products" });
   }
 };
-
-// const getAllProduct = async (req, res) => {
-//   try {
-//     const products = await Product.findAll({
-//       where: { is_active: true },
-//       attributes: ["id", "name", "description", "price", "stock"],
-//       include: [
-//         { model: ProductImage, as: "images", attributes: ["imageUrl"] },
-//       ],
-//     });
-//     return res
-//       .status(200)
-//       .json({ message: "Data fetch Successfully.", data: products });
-//   } catch (error) {
-//     // console.log(error);
-//     return res
-//       .status(500)
-//       .json({ status: "error", message: "Failed to fetch products" });
-//   }
-// };
 
 const getProductById = async (req, res) => {
   try {
@@ -168,7 +167,15 @@ const updateProduct = async (req, res) => {
     const validationError = handleValidationErrors(req, res);
     if (validationError) return validationError;
 
-    const { name, description, price, stock, id, deletedId = [] } = req.body;
+    const {
+      name,
+      description,
+      price,
+      stock,
+      id,
+      deletedId = [],
+      category_id,
+    } = req.body;
     const newImages = req.files || [];
     const deletedIdArray =
       deletedId.length > 0 ? deletedId.split(",").map(Number) : [];
@@ -214,6 +221,7 @@ const updateProduct = async (req, res) => {
     product.description = description || product.description;
     product.price = price || product.price;
     product.stock = stock || product.stock;
+    product.category_id = category_id || product.categoryId;
     await product.save();
 
     // Add new files to ProductImage
