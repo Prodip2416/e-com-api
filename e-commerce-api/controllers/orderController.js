@@ -6,7 +6,7 @@ const {
   Product,
   sequelize,
 } = require("../models");
-const { handleValidationErrors } = require("../utils/lib");
+const { handleValidationErrors, sendEmail } = require("../utils/lib");
 
 const createOrder = async (req, res) => {
   const transaction = await sequelize.transaction(); // Use transactions for atomicity
@@ -14,6 +14,7 @@ const createOrder = async (req, res) => {
     const validationError = handleValidationErrors(req, res);
     if (validationError) return validationError;
     const userId = req.user?.id;
+
     if (!userId) {
       return res.status(401).json({
         status: "error",
@@ -79,6 +80,7 @@ const createOrder = async (req, res) => {
     const order = await Order.create(
       {
         user_id: userId,
+        order_id: `ORDER_ID_${Date.now()}`,
         total_price: total_price,
         status: "pending", // Default status
       },
@@ -99,9 +101,23 @@ const createOrder = async (req, res) => {
     }
 
     await transaction.commit(); // Commit transaction
+
+    // Send email or notification
+    if (order && req.user.email) {
+      const emailText = `Hi ${req?.user?.name},\n\nWe are excited to let you know that your order has been successfully completed!\n\nHere are the details of your order:\n\nOrder ID: ${order?.order_id}\n\nIf you have any questions or need further assistance, please don't hesitate to contact our support team.\n\nThank you for choosing us for your purchase!\n\nBest regards,\n[Aushomapto]`;
+
+      const emailResponse = await sendEmail(
+        req.user.email,
+        "Order Confirmation Deatils",
+        emailText
+      );
+      if (!emailResponse.success) {
+        console.log(emailResponse.error);
+      }
+    }
     res.status(201).json({
       message: "Order created successfully",
-      order,
+      data: order,
     });
   } catch (error) {
     await transaction.rollback(); // Rollback transaction on failure
@@ -125,7 +141,7 @@ const getAllOrders = async (req, res) => {
     }
 
     // Find the cart for the user
-    const orders = await Order.findOne({
+    const orders = await Order.findAll({
       where: { user_id: userId },
       include: [
         {
@@ -154,26 +170,26 @@ const getAllOrders = async (req, res) => {
     });
   }
 };
-const cancelOrder = async (req, res) => {
+const updateStatus = async (req, res) => {
   try {
     const validationError = handleValidationErrors(req, res);
     if (validationError) return validationError;
 
-    const { order_id } = req.body;
+    const { order_id, status } = req.body;
     const order = await Order.findByPk(order_id);
     if (!order) {
       return res
         .status(404)
-        .json({ status: "error", message: "Order not found for the user" });
+        .json({ status: "error", message: "Order not found." });
     }
-    order.status = "cancelled";
+    order.status = status;
     await order.save();
 
     res.status(200).json({
-      message: "Your oder are successfully cancelled",
+      message: "Your order status are successfully updated.",
     });
   } catch (error) {
-    console.error("Error deleting cart:", error);
+    console.error("Error :", error);
     res.status(500).json({
       status: "error",
       message: "Internal server error",
@@ -184,6 +200,6 @@ const cancelOrder = async (req, res) => {
 
 module.exports = {
   createOrder,
-  cancelOrder,
+  updateStatus,
   getAllOrders,
 };
