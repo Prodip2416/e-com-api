@@ -2,7 +2,6 @@ const express = require("express");
 const authenticate = require("../middleware/authMiddleware");
 const {
   validateCreateOrder,
-  cancelOrderValidation,
   updateStatusOrderValidation,
 } = require("../validations/orderValidation");
 const {
@@ -10,6 +9,7 @@ const {
   getAllOrders,
   updateStatus,
 } = require("../controllers/orderController");
+const isAdmin = require("../middleware/isAdminMiddleware");
 
 const router = express.Router();
 
@@ -19,6 +19,7 @@ router.get("/orders", authenticate, getAllOrders);
 router.put(
   "/status-change",
   authenticate,
+  isAdmin,
   updateStatusOrderValidation,
   updateStatus
 );
