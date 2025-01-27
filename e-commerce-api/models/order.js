@@ -5,6 +5,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true,
     },
+    order_id: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     user_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -18,8 +22,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM("pending", "completed", "cancelled"),
-      defaultValue: "pending",
+      type: DataTypes.ENUM("Pending", "Shipped", "Delivered", "Canceled"),
+      defaultValue: "Pending",
     },
     created_at: {
       type: DataTypes.DATE,

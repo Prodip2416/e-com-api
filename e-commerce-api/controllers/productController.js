@@ -1,8 +1,8 @@
-const { Product, ProductImage } = require("../models");
-const { handleValidationErrors } = require("../utils/lib");
+const { Product, ProductImage, Category } = require("../models");
+const { handleValidationErrors, paginateResults } = require("../utils/lib");
 const path = require("path");
 const fs = require("fs");
-const { Op, where } = require("sequelize");
+const { Op } = require("sequelize");
 
 const createProduct = async (req, res) => {
   try {
@@ -33,18 +33,97 @@ const createProduct = async (req, res) => {
 
 const getAllProduct = async (req, res) => {
   try {
+    // Extract filters from query parameters
+    const { name, minPrice, maxPrice, category, inStock, sortBy } = req.query;
+    // Build dynamic where clause for filtering
+    const whereClause = { is_active: true };
+
+    //name filter
+    if (name) {
+      whereClause.name = { [Op.like]: `%${name}%` };
+    }
+
+    // Price range filter
+    if (minPrice && maxPrice) {
+      whereClause.price = {
+        [Op.between]: [parseFloat(minPrice), parseFloat(maxPrice)],
+      };
+    } else if (minPrice) {
+      whereClause.price = {
+        [Op.gte]: parseFloat(minPrice),
+      };
+    } else if (maxPrice) {
+      whereClause.price = {
+        [Op.lte]: parseFloat(maxPrice),
+      };
+    }
+
+    // Availability filter (in stock or out of stock)
+    if (inStock !== undefined) {
+      whereClause.stock = inStock === "true" ? { [Op.gt]: 0 } : 0;
+    }
+    let includeOptions = [
+      {
+        model: ProductImage,
+        as: "images",
+        attributes: ["imageUrl"],
+      },
+      {
+        model: Category,
+        as: "category",
+        attributes: ["id", "name"],
+      },
+    ];
+    if (category) {
+      includeOptions.push({
+        model: Category, // Assuming there's a Category model
+        as: "category",
+        where: { name: category },
+        attributes: ["id", "name"],
+      });
+    }
+
+    // Sorting logic
+    let order = []; // Default no sorting
+    if (sortBy) {
+      switch (sortBy.toLowerCase()) {
+        case "price_asc":
+          order.push(["price", "ASC"]);
+          break;
+        case "price_desc":
+          order.push(["price", "DESC"]);
+          break;
+        case "rating":
+          order.push(["rating", "DESC"]); // Assuming a `rating` column exists in the Product model
+          break;
+        default:
+          break; // No sorting if sortBy is invalid
+      }
+    }
+
+    // Fetch products with applied filters & sorting
     const products = await Product.findAll({
-      where: { is_active: true },
+      where: whereClause,
       attributes: ["id", "name", "description", "price", "stock"],
-      include: [
-        { model: ProductImage, as: "images", attributes: ["imageUrl"] },
-      ],
+      include: includeOptions,
+      order,
     });
-    return res
-      .status(200)
-      .json({ message: "Data fetch Successfully.", data: products });
+
+    const { results: paginatedProducts, pagination } = paginateResults(
+      products,
+      req.params.page,
+      req.params.limit
+    );
+
+    return res.status(200).json({
+      message: "Data fetched successfully.",
+      data: {
+        products: paginatedProducts,
+        pagination,
+      },
+    });
   } catch (error) {
-    // console.log(error);
+    console.error("Error fetching products:", error);
     return res
       .status(500)
       .json({ status: "error", message: "Failed to fetch products" });
@@ -88,7 +167,15 @@ const updateProduct = async (req, res) => {
     const validationError = handleValidationErrors(req, res);
     if (validationError) return validationError;
 
-    const { name, description, price, stock, id, deletedId = [] } = req.body;
+    const {
+      name,
+      description,
+      price,
+      stock,
+      id,
+      deletedId = [],
+      category_id,
+    } = req.body;
     const newImages = req.files || [];
     const deletedIdArray =
       deletedId.length > 0 ? deletedId.split(",").map(Number) : [];
@@ -134,6 +221,7 @@ const updateProduct = async (req, res) => {
     product.description = description || product.description;
     product.price = price || product.price;
     product.stock = stock || product.stock;
+    product.category_id = category_id || product.categoryId;
     await product.save();
 
     // Add new files to ProductImage
