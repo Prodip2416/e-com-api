@@ -59,18 +59,12 @@ This is a basic e-commerce application that provides essential features for user
 - **Multiple Payment Methods**:
   - Credit/Debit cards
   - Cash on delivery
-- **Secure Transactions**: Payments are processed securely, and payment status is tracked.
 
-### 8. Shipping & Address Management
-- **Shipping Address**: Users can save and manage multiple shipping addresses.
-
-### 9. Notifications
+### 8. Notifications
 - **Email Notifications**:
   - Order confirmation.
-  - Shipping updates.
-  - Password resets.
 
-### 10. Admin Panel
+### 9. Admin Panel
 - **Dashboard**: Admins can view:
   - Total sales
   - New orders
