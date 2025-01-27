@@ -21,16 +21,18 @@ This is a basic e-commerce application that provides essential features for user
   - Price
   - Stock
   - Images
+  - Ratings
 
 ### 3. Product Search & Filtering
 - **Search Functionality**: Search products by name.
-- **Pagination**: limit, page
+- **Pagination**: Limit, page.
 - **Filters**: Filter products by:
   - Price range
   - Category
-  - Availability (in stock or out of stock)
+  - Availability (in stock or out of stock).
 - **Sorting**: Sort products by:
-  - Price (low to high, high to low)
+  - Price (low to high, high to low).
+  - Ratings.
 
 ### 4. Shopping Cart
 - **Add to Cart**: Users can add products to their cart.
@@ -51,14 +53,14 @@ This is a basic e-commerce application that provides essential features for user
   - Pending
   - Shipped
   - Delivered
-  - Canceled
+  - Canceled.
 
 ### 7. Payment Gateway Integration
 - **Supported Payment Gateways**:
-  - Stripe
+  - Stripe.
 - **Multiple Payment Methods**:
-  - Credit/Debit cards
-  - Cash on delivery
+  - Credit/Debit cards.
+  - Cash on delivery.
 
 ### 8. Notifications
 - **Email Notifications**:
@@ -66,16 +68,16 @@ This is a basic e-commerce application that provides essential features for user
 
 ### 9. Admin Panel
 - **Dashboard**: Admins can view:
-  - Total sales
-  - New orders
-  - Customer growth
+  - Total sales.
+  - New orders.
+  - Canceled orders.
+  - Customer growth.
 - **User Management**:
   - View, edit, or delete users.
 - **Product Management**:
   - Add, update, or delete products.
   - Manage product categories.
 - **Order Management**:
-  - View order history.
   - Update order status.
 
 ## Uses Technology
@@ -97,9 +99,9 @@ This is a basic e-commerce application that provides essential features for user
 ## Installation
 
 ### Prerequisites
-- Node.js (>= 14.x)
-- npm or yarn
-- A database ( MySQL )
+- Node.js (>= 14.x).
+- npm or yarn.
+- A database (MySQL).
 
 ### Steps
 1. Clone the repository:
@@ -142,53 +144,65 @@ This is a basic e-commerce application that provides essential features for user
 ## API Endpoints (Sample)
 
 ### Authentication
-| Method | Endpoint              | Description                      | Example Payload                                                                 |
-|--------|-----------------------|----------------------------------|-------------------------------------------------------------------------------|
-| POST   | /api/auth/signup      | Register a new user              | `{ "name": "Mr. Dip", "email": "prodip.sarker.cse@gmail.com", "password": "123456" }` |
-| POST   | /api/auth/login       | Login user                       | `{ "email": "boby@gmail.com", "password": "123456" }`                       |
-| POST   | /api/auth/verify      | Verify a user                    | `{ "email": "prodip.sarker.cse@gmail.com", "code": "ed245b87e4dc1645f8e85ee09ff5f55e" }` |
+| Method | Endpoint              | Description       | Example Payload                                                                 |
+|--------|-----------------------|-------------------|-------------------------------------------------------------------------------|
+| POST   | `/api/auth/signup`    | Register a user  | `{ "name": "Mr. Dip", "email": "prodip.sarker.cse@gmail.com", "password": "123456" }` |
+| POST   | `/api/auth/login`     | Login a user     | `{ "email": "prodip.sarker.cse@gmail.com", "password": "123456" }`                        |
+| POST   | `/api/auth/verify`    | Verify email     | `{ "email": "prodip.sarker.cse@gmail.com", "code": "ed245b87e4dc1645f8e85ee09ff5f55e" }` |
 
 ### Users
-| Method | Endpoint              | Description                      | Example Payload |
-|--------|-----------------------|----------------------------------|-----------------|
-| GET    | /api/user/users       | Get all users                    | -               |
+| Method | Endpoint          | Description  | Example Payload |
+|--------|-------------------|--------------|-----------------|
+| GET    | `/api/user/users` | Get all users | -              |
 
 ### Roles
-| Method | Endpoint              | Description                      | Example Payload                                          |
-|--------|-----------------------|----------------------------------|--------------------------------------------------------|
-| POST   | /api/role/role        | Create a new role                | `{ "name": "HOD", "description": "" }`                 |
-| GET    | /api/role/roles       | Get all roles                    | -                                                      |
-| GET    | /api/role/role/:id    | Get role by ID                   | -                                                      |
-| PUT    | /api/role/role        | Update a role                    | `{ "id": 3, "name": "Customer", "description": "" }`  |
-| DELETE | /api/role/role        | Delete a role                    | `{ "id": 4 }`                                         |
+| Method | Endpoint              | Description       | Example Payload                               |
+|--------|-----------------------|-------------------|-----------------------------------------------|
+| POST   | `/api/role/role`      | Create a role     | `{ "name": "HOD", "description": "" }`       |
+| GET    | `/api/role/roles`     | Get all roles     | -                                             |
+| GET    | `/api/role/role/:id`  | Get role by ID    | -                                             |
+| PUT    | `/api/role/role`      | Update a role     | `{ "id": 3, "name": "Customer", "description": "" }` |
+| DELETE | `/api/role/role`      | Delete a role     | `{ "id": 4 }`                                |
 
 ### Products
-| Method | Endpoint              | Description                      | Example Payload                                                                                  |
-|--------|-----------------------|----------------------------------|------------------------------------------------------------------------------------------------|
-| POST   | /api/product/product  | Create a new product             | Form Data: `{ name: "Iphone 15", description: "", price: "1100", stock: "20" } + files` |
-| GET    | /api/product/products | Get all products                 | -                                                                                              |
-| GET    | /api/product/product/:id | Get product by ID             | -                                                                                              |
-| PUT    | /api/product/product  | Update a product                 | Form Data: `{ name: "Iphone 15 Pro", price: "900", stock: "30", id: "3" }`                 |
-| DELETE | /api/product/product/:id | Delete a product             | -                                                                                              |
+| Method | Endpoint                  | Description          | Example Payload                                                                                  |
+|--------|---------------------------|----------------------|--------------------------------------------------------------------------------------------------|
+| POST   | `/api/product/product`    | Create a product     | Form Data: `{ name: "Iphone 15", description: "", price: "1100", stock: "20", rating: 4.5 } + files |
+| GET    | `/api/product/products`   | Get all products     | Query Params: `?limit=2&page=4`                                                                  |
+| GET    | `/api/product/product/:id`| Get product by ID    | -                                                                                                |
+| PUT    | `/api/product/product`    | Update a product     | Form Data: `{ id: 9, name: "Samsung S22", price: 900, stock: 1, rating: 4.0 }`                  |
+| DELETE | `/api/product/product/:id`| Delete a product     | -                                                                                                |
 
 ### Cart
-| Method | Endpoint              | Description                      | Example Payload                                                                 |
-|--------|-----------------------|----------------------------------|-------------------------------------------------------------------------------|
-| POST   | /api/cart/cart        | Create a cart entry               | `{ "cart": [ { "product_id": 1, "quantity": 2, "price": 1100 } ] }`     |
-| GET    | /api/cart/cart        | Get cart by user                 | -                                                                             |
-| DELETE | /api/cart/cart        | Delete all cart items            | -                                                                             |
+| Method | Endpoint              | Description         | Example Payload                                                              |
+|--------|-----------------------|---------------------|------------------------------------------------------------------------------|
+| POST   | `/api/cart/cart`      | Add items to cart   | `{ "cart": [ { "product_id": 1, "quantity": 2, "price": 1100 } ] }`          |
+| GET    | `/api/cart/cart`      | Get user cart       | -                                                                            |
+| DELETE | `/api/cart/cart`      | Clear user cart     | -                                                                            |
 
 ### Orders
-| Method | Endpoint              | Description                      | Example Payload                                           |
-|--------|-----------------------|----------------------------------|---------------------------------------------------------|
-| POST   | /api/order/order      | Create a new order               | `{ "cart_id": 3, "total_price": 4200 }`                |
-| GET    | /api/order/orders     | Get all orders                   | -                                                       |
-| PUT    | /api/order/cancel-order | Cancel an order                | `{ "order_id": 3 }`                                    |
+| Method | Endpoint                  | Description       | Example Payload                       |
+|--------|---------------------------|-------------------|---------------------------------------|
+| POST   | `/api/order/order`        | Create an order   | `{ "cart_id": 8, "total_price": 4200 }`|
+| GET    | `/api/order/orders`       | Get all orders    | -                                     |
+| PUT    | `/api/order/status-change`| Change order status| `{ "order_id": 5, "status": "Canceled" }` |
 
 ### Payments
-| Method | Endpoint              | Description                      | Example Payload                                           |
-|--------|-----------------------|----------------------------------|---------------------------------------------------------|
-| POST   | /api/payment/create-payment | Create a payment           | `{ "order_id": 3, "amount": 4200, "currency": "BDT" }` |
+| Method | Endpoint                  | Description       | Example Payload                                   |
+|--------|---------------------------|-------------------|-------------------------------------------------|
+| POST   | `/api/payment/create-payment` | Create a payment | `{ "order_id": 3, "amount": 4200, "currency": "BDT" }` |
+
+### Wishlist
+| Method | Endpoint                 | Description          | Example Payload                      |
+|--------|--------------------------|----------------------|--------------------------------------|
+| POST   | `/api/wishlist/wishlist` | Add to wishlist      | `{ "product_id": 1, "user_id": 1 }` |
+| GET    | `/api/wishlist/wishlist` | Get wishlist         | -                                    |
+| DELETE | `/api/wishlist/wishlist` | Remove from wishlist | `{ "product_id": 1, "user_id": 1 }` |
+
+### Dashboard
+| Method | Endpoint                     | Description        | Example Payload |
+|--------|------------------------------|--------------------|-----------------|
+| GET    | `/api/admin/dashborad`       | Get dashboard data | -               |
 
 ## License
 This project is licensed under the [MIT License](LICENSE).

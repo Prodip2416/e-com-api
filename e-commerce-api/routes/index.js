@@ -10,6 +10,7 @@ fs.readdirSync(__dirname)
   .forEach((file) => {
     const route = require(path.join(__dirname, file));
     const routeName = file.replace("Routes.js", ""); // Remove "Routes.js" from the filename
+    // console.log(routeName)
     router.use(`/${routeName}`, route); // Use the route file
   });
 
