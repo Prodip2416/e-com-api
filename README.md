@@ -120,15 +120,19 @@ This is a basic e-commerce application that provides essential features for user
    - Create a `.env` file in the root directory.
    - Add the following variables:
      ```env
-     PORT=5000
-     DB_HOST=localhost
-     DB_USER=root
-     DB_PASSWORD=yourpassword
-     DB_NAME=ecommerce
-     JWT_SECRET=yourjwtsecret
-     EMAIL=youremail@gmail.com
-     EMAIL_PASSWORD=youremailpassword
-     STRIPE_SECRET_KEY=yourstripekey
+      APP_PORT=3000
+      DB_NAME=ecommerce
+      DB_USER=root
+      DB_PASSWORD=root
+      DB_HOST=localhost
+      JWT_SECRET=secret_key
+      BASE_PATH=uploads/
+      STRIPE_SECRET_KEY=secret_key_from_stripe
+      STRIPE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET
+      EMAIL_USER=abc@gmail.com
+      EMAIL_PASSWORD=password
+      CLIENT_URL_FOR_EMAIL_VERIFY=localhost:5000
+      IMAGE_SHOW_BASE_URL_=http://localhost:3000/api/
      ```
 5. Run database migrations (Sequelize example):
    ```bash
@@ -162,7 +166,24 @@ This is a basic e-commerce application that provides essential features for user
 | GET    | `/api/role/roles`     | Get all roles     | -                                             |
 | GET    | `/api/role/role/:id`  | Get role by ID    | -                                             |
 | PUT    | `/api/role/role`      | Update a role     | `{ "id": 3, "name": "Customer", "description": "" }` |
-| DELETE | `/api/role/role`      | Delete a role     | `{ "id": 4 }`                                |
+| DELETE | `/api/role/role`      | Delete a role     | `{ "id": 4 }
+
+### User Role Assign
+| Method | Endpoint              | Description       | Example Payload                               |
+|--------|-----------------------|-------------------|-----------------------------------------------|
+| POST   | `/api/userRole/assign-role`      | assign a role     | `{ "userId": 1, "roleId": 2 }`       |
+| GET    | `/api/userRole/remove-role`     | remove a role  | `{ "userId": 1, "roleId": 2 }`                                      |
+| GET    | `/api/userRole/2/roles`  | Get role by user ID    | -                                             |
+
+
+### Categories
+| Method | Endpoint              | Description       | Example Payload                               |
+|--------|-----------------------|-------------------|-----------------------------------------------|
+| POST   | `/api/category/category`      | Create a category     | `{ "name": "Admin", "description": "" }`       |
+| GET    | `/api/category/categories`     | Get all category     | -                                             |
+| GET    | `/api/category/category/:id`  | Get category by ID    | -                                             |
+| PUT    | `/api/category/category`      | Update a role     | `{ "id": 3, "name": "Admin", "description": "" }` |
+| DELETE | `/api/category/category`      | Delete a role     | `{ "id": 4 }`                                |
 
 ### Products
 | Method | Endpoint                  | Description          | Example Payload                                                                                  |
@@ -191,6 +212,12 @@ This is a basic e-commerce application that provides essential features for user
 | Method | Endpoint                  | Description       | Example Payload                                   |
 |--------|---------------------------|-------------------|-------------------------------------------------|
 | POST   | `/api/payment/create-payment` | Create a payment | `{ "order_id": 3, "amount": 4200, "currency": "BDT" }` |
+
+### Rating
+| Method | Endpoint                 | Description          | Example Payload                      |
+|--------|--------------------------|----------------------|--------------------------------------|
+| POST   | `/api/productRating/rating` | Add to Rating      | `{ "product_id": 1, "rating": 1 ,"feedback":"something ....."}` |
+| GET    | `/api/productRating/rating` | Get Rating         | `{"product_id": 1}`-                                    |
 
 ### Wishlist
 | Method | Endpoint                 | Description          | Example Payload                      |
